@@ -15,5 +15,6 @@ export default defineConfig({
     }),
   ],
   // Enable server endpoints
+  output: "static",
   adapter: vercel()
 });
