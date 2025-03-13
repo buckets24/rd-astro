@@ -10,46 +10,46 @@
 	<body>
 		<slot />
     <script
-        id="google-tag-manager"
-        src="https://www.googletagmanager.com/gtag/js?id=UA-122527750-1"
-        type="text/partytown"
-      />
-      <script
-        id="gtmsbr"
-        src="https://gtmsvr.konsciousketo.com/gtm.js?id=GTM-56TX85F"
-        type="text/partytown"
-      />
-      <script 
-        id="google-analytics"
-        type="text/partytown"
-      >
-        {`
-          // Use a unique namespace for dataLayer to avoid conflicts
-          window.kketoDataLayer = window.kketoDataLayer || [];
-          function gtag() {
-            window.kketoDataLayer.push(arguments);
-          }
-          gtag('js', new Date());
-          gtag('config', 'AW-770742054');
-          gtag('config', 'AW-11038484286');
-        `}
-      </script>
-      <script
-        type="text/partytown"
-        src="https://polaris.truevaultcdn.com/static/polaris.js"
-      />
-      <script
-        id="polaris-config"
-        type="text/partytown"
-      >
-        {`
-          window.polarisOptions = {
-            GoogleAnalyticsTrackingId: "G-381562022",
-            enableConsentManager: true,
-            privacyCenterId: "2WDWRB6YE",
-          };
-        `}
-      </script>
+      id="google-tag-manager"
+      src="https://www.googletagmanager.com/gtag/js?id=UA-122527750-1"
+      type="text/javascript"
+    />
+    <script
+      id="gtmsbr"
+      src="https://gtmsvr.konsciousketo.com/gtm.js?id=GTM-56TX85F"
+      type="text/javascript"
+    />
+    <script 
+      id="google-analytics"
+      type="text/javascript"
+    >
+      {`
+        // Use a unique namespace for dataLayer to avoid conflicts
+        window.kketoDataLayer = window.kketoDataLayer || [];
+        function gtag() {
+          window.kketoDataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+        gtag('config', 'AW-770742054');
+        gtag('config', 'AW-11038484286');
+      `}
+    </script>
+    <script
+      type="text/javascript"
+      src="https://polaris.truevaultcdn.com/static/polaris.js"
+    />
+    <script
+      id="polaris-config"
+      type="text/javascript"
+    >
+      {`
+        window.polarisOptions = {
+          GoogleAnalyticsTrackingId: "G-381562022",
+          enableConsentManager: true,
+          privacyCenterId: "2WDWRB6YE",
+        };
+      `}
+    </script>
 	</body>
 </html>
 
