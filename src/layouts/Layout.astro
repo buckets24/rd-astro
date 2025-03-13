@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="generator" content={Astro.generator} />
+		<title>Astro Basics</title>
+	</head>
+	<body>
+		<slot />
+    <script
+        src="https://www.googletagmanager.com/gtag/js?id=UA-122527750-1"
+        type="text/partytown"
+      />
+      <script
+        src="https://gtmsvr.konsciousketo.com/gtm.js?id=GTM-56TX85F"
+        type="text/partytown"
+      />
+      <script 
+        id="google-analytics" 
+        type="text/partytown"
+      >
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            window.dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', 'AW-770742054');
+          gtag('config', 'AW-11038484286');
+        `}
+      </script>
+      <script
+        type="text/partytown"
+        src="https://polaris.truevaultcdn.com/static/polaris.js"
+      />
+      <script
+        type="text/partytown"
+        id="polaris-config"
+      >
+        {`
+          window.polarisOptions = {
+            GoogleAnalyticsTrackingId: "G-381562022",
+            enableConsentManager: true,
+            privacyCenterId: "2WDWRB6YE",
+          };
+        `}
+      </script>
+	</body>
+</html>
+
+<style>
+	html,
+	body {
+		margin: 0;
+		width: 100%;
+		height: 100%;
+	}
+</style>

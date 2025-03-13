@@ -1,0 +1,305 @@
+---
+// Import statements at the top in the frontmatter
+import { Image } from 'astro:assets';
+
+// Props interface
+interface Props {
+  videoId: string;
+  timerSeconds: number;
+  options: {
+    autoPlay?: boolean;
+    playbar?: boolean;
+    volumeControl?: boolean;
+    smallPlayButton?: boolean;
+    fullscreenButton?: boolean;
+  };
+}
+
+// Get component props
+const { videoId, timerSeconds, options } = Astro.props;
+---
+
+<script define:vars={{ videoId, timerSeconds, options }}>
+  // Utility functions
+  const createDebounce = (wait) => {
+    let timeout;
+    return (func) => (...args) => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func(...args), wait);
+    };
+  };
+
+  const toggleFullscreenMode = (show) => {
+    const videoContainer = document.querySelector('.video-container');
+    const doctorInfo = document.querySelector('[data-id="hero-section-doctor-info"]');
+    const wistiaWrapper = document.querySelector('[data-id="wistia-wrapper-v3"]');
+
+    if (!videoContainer || !wistiaWrapper || !doctorInfo) return;
+
+    const fullscreenClasses = [
+      '!px-0',
+      '!py-0',
+      'lg:!h-screen',
+      'lg:!w-full',
+      'lg:!max-w-full',
+      'lg:!max-h-full'
+    ];
+
+    if (show) {
+      videoContainer.classList.add('fullwidth');
+      doctorInfo.classList.replace('block', 'hidden');
+      wistiaWrapper.classList.add(...fullscreenClasses);
+      wistiaWrapper.children[0]?.classList.add('w-full', 'max-w-full');
+    } else {
+      videoContainer.classList.remove('fullwidth');
+      doctorInfo.classList.replace('hidden', 'block');
+      wistiaWrapper.classList.remove(...fullscreenClasses);
+      wistiaWrapper.children[0]?.classList.remove('w-full', 'max-w-full');
+    }
+  };
+
+  // Handle keyboard shortcut
+  document.addEventListener('keydown', ({ ctrlKey, key }) => {
+    if (ctrlKey && key === 'b') {
+      document.documentElement.classList.add('button-dropped');
+    }
+  });
+
+  // Initialize Wistia
+  const initWistia = async () => {
+    const scriptTag = document.createElement('script');
+    scriptTag.src = 'https://fast.wistia.com/assets/external/E-v1.js';
+    scriptTag.async = true;
+
+    const loadScript = () => {
+      return new Promise((resolve) => {
+        scriptTag.onload = resolve;
+        document.head.appendChild(scriptTag);
+      });
+    };
+
+    await loadScript();
+
+    const hasVideobar = window.location.hash.toLowerCase() === '#videobar';
+    if (hasVideobar) options.playbar = true;
+    
+    window._wq = window._wq || [];
+    window._wq.push({
+      id: videoId,
+      options,
+      onReady: (video) => {
+        const isMobile = window.innerWidth < 768;
+        const debouncedResize = createDebounce(300);
+        
+        const handleVideoResize = debouncedResize(() => {
+          const videoContainer = document.querySelector('.video-container');
+          if (!videoContainer) return;
+
+          const aspectRatio = video.aspect();
+          const windowHeight = window.innerHeight;
+          let toHeight = Math.floor(window.innerWidth / aspectRatio);
+          let toWidth = videoContainer.offsetWidth;
+
+          if (isMobile) {
+            video.width(toWidth, { constrain: true });
+            videoContainer.style.height = `${Math.min(toHeight - 4, windowHeight)}px`;
+          } else if (video.state() === 'playing') {
+            toHeight = Math.min(toHeight, windowHeight);
+            toWidth = Math.floor(toHeight * aspectRatio);
+            video.width(toWidth, { constrain: true });
+          }
+        });
+
+        if (isMobile) {
+          handleVideoResize();
+          window.addEventListener('resize', handleVideoResize);
+          video.bind('widthchange', handleVideoResize);
+        }
+
+        video
+          .bind('secondchange', (seconds) => {
+            if (seconds === timerSeconds) {
+              document.documentElement.classList.add('button-dropped');
+            }
+          })
+          .bind('play', () => {
+            document.documentElement.classList.add('video-playing');
+            toggleFullscreenMode(true);
+          })
+          .bind('pause', () => {
+            document.documentElement.classList.remove('video-playing');
+            toggleFullscreenMode(false);
+          });
+      }
+    });
+  };
+
+  initWistia();
+</script>
+
+<div 
+  id="vidcont" 
+  class:list={[
+    "vidcont2 m-auto flex w-full flex-col gap-[16px] bg-[#ffffff] px-[0] py-[0] shadow-2xl md:flex-row md:gap-[35px]",
+    { "max-w-[840px]": Astro.slots.has('button-dropped'), "max-w-[1085.8px] md:px-[35px] md:pt-[45px] md:pb-[20px]": !Astro.slots.has('button-dropped') }
+  ]}
+>
+  <div class="block flex-grow-1">
+    <div class="wistia-container max-w-[87vw] m-auto">
+      <div class="wistia_responsive_padding relative pt-[56.25%] pr-0 pb-0 pl-0">
+        <div class="wistia_responsive_wrapper absolute top-0 left-0 h-full w-full">
+          <div class={`wistia_embed m-auto h-full w-full wistia_async_${videoId}`} />
+        </div>
+      </div>
+    </div>
+    
+    <div class="beforedrop hideonplay hidden w-full px-[16px] md:block md:px-0 md:pt-[25px]">
+      <div class="text-[20px]">
+        <p class="inline-flex max-w-[776px] items-center text-center font-semibold md:m-auto">
+          <Image
+            class="mr-[5px] h-[16px] w-[16px] md:h-[24px] md:w-[24px]"
+            src="https://resetdigestion.com/pages/er-vslfb-v3/charm_sound.png?v=56?v=1"
+            alt="Sound icon"
+            width={16}
+            height={16}
+            loading="lazy"
+            quality={50}
+          />
+          <span class="mr-[5px] text-[22px] font-bold text-[#d0190d]">
+            IMPORTANT:
+          </span>
+          <span class="align-middle text-black">
+            Your video may take 10 seconds to load. Make sure your sound is on.
+          </span>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="hideonplay beforedrop hidden w-full px-[16px] pb-[10px] md:block md:w-[204.8px] md:px-0" data-id="hero-section-doctor-info">
+    <div class="flex flex-col gap-[10px]">
+      <div>
+        <Image
+          src="https://resetdigestion.com/pages/er-vslfb-v3/drginasam.png?v=56?v=1"
+          class="ginaimage w-[81.96px] md:w-[147.2px]"
+          alt="Dr. Gina Sam"
+          width={81.96}
+          height={147.2}
+          loading="lazy"
+          quality={50}
+        />
+      </div>
+      <div class="flex flex-col">
+        <span class="max-w-fit rounded-[2px] bg-[#e34134] px-1 text-[12.8px] font-[600] text-nowrap text-white">
+          Top Gastroenterologist 2024
+        </span>
+        <span class="text-[25.6px] leading-[32px] font-[700] text-[#1c624d] underline">
+          Dr. Gina Sam M.D
+        </span>
+      </div>
+    </div>
+    <p class="text-[18px] text-black md:text-[13px]">
+      <b>
+        Dr. Gina Sam, MD, is a leading NYC gastroenterologist and former
+        director of the Mount Sinai Gastrointestinal Motility Center
+      </b>
+      . Over her 20-year career, Dr. Sam has specialized in treating digestive
+      and metabolic disorders, founding the Institute of Gastrointestinal
+      Motility Disorders and Integrative Health in New York City.
+      <em>
+        Dr. Sam's research has positioned her at the forefront of
+        understanding
+        <b>obesity, fatigue and other metabolic dysfunctions.</b>
+      </em>
+    </p>
+  </div>
+</div>
+
+<div class="bg-[#ffffff] md:bg-transparent m-auto maxwidth mb-sm-0 pb-0 pt-1 mt-[8px] md:mt-[16px] md:pb-[24px] md:pt-[16px] flowheight">
+  <div class="text-[20px] px-[5px] hidden showonplay">
+    <p class="font-semibold max-w-[776px] md:m-auto text-center font-myriadpro">
+      <Image
+        class="h-[16px] md:h-[24px] w-[16px] md:w-[24px] mt-[6px] md:mt-[4px] me-[5px]"
+        src="https://resetdigestion.com/pages/er-vslfb-v2/charm_sound.png"
+        alt="Sound icon"
+        width={16}
+        height={16}
+        loading="lazy"
+        quality={50}
+      />
+      <span class="align-middle">Your video may take 10 seconds to load. Make sure your sound is on.</span>
+      <Image
+        src="https://emmarelief.com/cdn/shop/t/10/assets/greenarrowdown.png?v=90230465467182572741687505008"
+        class="garrow afterdrop d-none m-auto mt-2 mt-sm-4"
+        style="width: 39px"
+        alt="Green arrow down"
+        width={39}
+        height={39}
+      />
+    </p>
+  </div>
+
+  <div class="text-[22px] px-[5px] afterdrop mt-[33px] !hidden md:block">
+    <p class="font-semibold max-w-[830px] md:m-auto text-center font-myriadpro">
+      <Image
+        class="h-[16px] md:h-[24px] w-[16px] md:w-[24px] inline-block me-[5px]"
+        src="https://resetdigestion.com/pages/er-vslfb-v2/charm_sound.png"
+        alt="Sound icon"
+        width={16}
+        height={16}
+        loading="lazy"
+        quality={50}
+      />
+      <span class="align-middle text-[#000000]">Your video may take 10 seconds to load. Make sure your sound is on.</span>
+      <Image
+        src="https://emmarelief.com/cdn/shop/t/10/assets/greenarrowdown.png?v=90230465467182572741687505008"
+        class="garrow afterdrop d-none m-auto mt-2 mt-sm-4"
+        style="width: 39px"
+        alt="Green arrow down"
+        width={39}
+        height={39}
+      />
+    </p>
+  </div>
+
+  <div class="text-[16px] px-[5px] block md:hidden mobileimportant">
+    <p class="font-semibold max-w-[776px] text-center font-myriadpro">
+      <Image
+        class="h-[16px] w-[16px] me-[5px] inline-block"
+        src="https://resetdigestion.com/pages/er-vslfb-v2/charm_sound.png"
+        alt="Sound icon"
+        width={16}
+        height={16}
+        loading="lazy"
+        quality={50}
+      />
+      <span class="align-middle text-[#000000]">Your video may take 10 seconds to load. Make sure your sound is on.</span>
+      <Image
+        src="https://emmarelief.com/cdn/shop/t/10/assets/greenarrowdown.png?v=90230465467182572741687505008"
+        class="garrow afterdrop d-none m-auto mt-2 mt-sm-4"
+        style="width: 39px"
+        alt="Green arrow down"
+        width={39}
+        height={39}
+      />
+    </p>
+  </div>
+</div>
+
+<style>
+  .video-playing .hideonplay {
+    display: none;
+  }
+  
+  .video-playing .showonplay {
+    display: block;
+  }
+
+  .button-dropped .beforedrop {
+    display: none;
+  }
+
+  .button-dropped .afterdrop {
+    display: block;
+  }
+</style>
