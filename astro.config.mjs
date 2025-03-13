@@ -6,12 +6,13 @@ import partytown from '@astrojs/partytown';
 // https://astro.build/config
 export default defineConfig({
   integrations: [
-    tailwind(),
     partytown({
       config: {
-        debug: true,
-        forward: ['dataLayer.push']
-      }
-    })
-  ]
+        debug: true, // Temporarily enable debug mode to help troubleshoot
+        forward: ['dataLayer.push', 'gtag'],
+      },
+    }),
+  ],
+  // Enable server endpoints
+  output: 'server',
 });

@@ -6,55 +6,85 @@
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="generator" content={Astro.generator} />
 		<title>Astro Basics</title>
+		
+		<!-- Partytown configuration -->
+    <script>
+      declare global {
+        interface Window {
+          partytown: any;
+        }
+      }
+      window.partytown = {
+        debug: true, // Enable Partytown debug logging
+        forward: ['dataLayer.push', 'gtag'],
+        resolveUrl: (url: URL) => {
+          try {
+            const proxyDomains = [
+              'googletagmanager.com',
+              'gtmsvr.konsciousketo.com',
+              'truevaultcdn.com'
+            ];
+            
+            // Add debug logging
+            console.log('Partytown resolveUrl:', {
+              url: url.href,
+              hostname: url.hostname,
+              shouldProxy: proxyDomains.some(domain => url.hostname.includes(domain))
+            });
+            
+            if (url && url.hostname && proxyDomains.some(domain => url.hostname.includes(domain))) {
+              const proxyUrl = new URL('/_proxy', location.origin);
+              proxyUrl.searchParams.append('url', url.href);
+              console.log('Using proxy URL:', proxyUrl.href);
+              return proxyUrl;
+            }
+            return url;
+          } catch (error) {
+            console.error('Partytown resolveUrl error:', error);
+            return url;
+          }
+        }
+      };
+    </script>
 	</head>
 	<body>
 		<slot />
-    <script
-      src="https://www.googletagmanager.com/gtag/js?id=UA-122527750-1"
-      type="text/javascript"
-      async
-      defer
-    />
-    <script
-      src="https://gtmsvr.konsciousketo.com/gtm.js?id=GTM-56TX85F"
-      type="text/javascript"
-      async
-      defer
-    />
-    <script 
-      type="text/javascript"
-      async
-      defer
-    >
-      {`
-        // Use a unique namespace for dataLayer to avoid conflicts
-        window.kketoDataLayer = window.kketoDataLayer || [];
-        function gtag() {
-          window.kketoDataLayer.push(arguments);
-        }
-        gtag('js', new Date());
-        gtag('config', 'AW-770742054');
-        gtag('config', 'AW-11038484286');
-      `}
-    </script>
-    <script
-      type="text/javascript"
-      src="https://polaris.truevaultcdn.com/static/polaris.js"
-      async
-    />
-    <script
-      id="polaris-config"
-      type="text/javascript"
-      async
-    >
-      {`
-        window.polarisOptions = {
-          GoogleAnalyticsTrackingId: "G-381562022",
-          enableConsentManager: true,
-          privacyCenterId: "2WDWRB6YE",
-        };
-      `}
-    </script>
+		
+		<!-- Analytics and tracking scripts -->
+		<script type="text/partytown" defer>
+			// Initialize dataLayer
+			window.dataLayer = window.dataLayer || [];
+			function gtag() {
+				dataLayer.push(arguments);
+			}
+			
+			// Load Google Analytics
+			const gaScript = document.createElement('script');
+			gaScript.src = "https://www.googletagmanager.com/gtag/js?id=UA-122527750-1";
+			document.head.appendChild(gaScript);
+			
+			// Configure GTM
+			const gtmScript = document.createElement('script');
+			gtmScript.src = "https://gtmsvr.konsciousketo.com/gtm.js?id=GTM-56TX85F";
+			document.head.appendChild(gtmScript);
+			
+			// Configure Google Analytics
+			gtag('js', new Date());
+			gtag('config', 'AW-770742054');
+			gtag('config', 'AW-11038484286');
+			
+			// Load Polaris
+			const polarisScript = document.createElement('script');
+			polarisScript.src = "https://polaris.truevaultcdn.com/static/polaris.js";
+			document.head.appendChild(polarisScript);
+			
+			// Configure Polaris
+			window.polarisOptions = {
+				GoogleAnalyticsTrackingId: "G-381562022",
+				enableConsentManager: true,
+				privacyCenterId: "2WDWRB6YE",
+			};
+		</script>
 	</body>
 </html>
 
