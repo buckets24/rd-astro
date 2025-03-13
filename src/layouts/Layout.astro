@@ -18,13 +18,14 @@
         type="text/partytown"
       />
       <script 
-        id="google-analytics" 
+        id="google-analytics"
         type="text/partytown"
       >
         {`
-          window.dataLayer = window.dataLayer || [];
+          // Use a unique namespace for dataLayer to avoid conflicts
+          window.kketoDataLayer = window.kketoDataLayer || [];
           function gtag() {
-            window.dataLayer.push(arguments);
+            window.kketoDataLayer.push(arguments);
           }
           gtag('js', new Date());
           gtag('config', 'AW-770742054');
@@ -36,8 +37,8 @@
         src="https://polaris.truevaultcdn.com/static/polaris.js"
       />
       <script
-        type="text/partytown"
         id="polaris-config"
+        type="text/partytown"
       >
         {`
           window.polarisOptions = {
