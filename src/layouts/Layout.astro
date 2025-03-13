@@ -10,18 +10,21 @@
 	<body>
 		<slot />
     <script
-      id="google-tag-manager"
       src="https://www.googletagmanager.com/gtag/js?id=UA-122527750-1"
       type="text/javascript"
+      async
+      defer
     />
     <script
-      id="gtmsbr"
       src="https://gtmsvr.konsciousketo.com/gtm.js?id=GTM-56TX85F"
       type="text/javascript"
+      async
+      defer
     />
     <script 
-      id="google-analytics"
       type="text/javascript"
+      async
+      defer
     >
       {`
         // Use a unique namespace for dataLayer to avoid conflicts
@@ -37,10 +40,14 @@
     <script
       type="text/javascript"
       src="https://polaris.truevaultcdn.com/static/polaris.js"
+      async
+      defer
     />
     <script
       id="polaris-config"
       type="text/javascript"
+      async
+      defer
     >
       {`
         window.polarisOptions = {
